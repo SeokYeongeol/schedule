@@ -14,6 +14,7 @@ public class Schedule {
     private String password;
     private String title;
     private String contents;
+    @Setter
     private Date date;
 
     public Schedule(Long id, String password) {

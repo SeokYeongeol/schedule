@@ -38,7 +38,7 @@ public class ScheduleServiceImpl implements ScheduleService{
     @Override
     public ScheduleResponseDto updateScheduleById(Long id, String name, String contents, String password) {
         if(name == null || contents == null || password == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name, contents and password are required values.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The name, contents and password are required values.");
         }
         else if(!password.equals(scheduleRepository.findPassword(id).getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is incorrect");
@@ -53,5 +53,36 @@ public class ScheduleServiceImpl implements ScheduleService{
         Schedule schedule = scheduleRepository.findScheduleByIdOrElseThrow(id);
 
         return new ScheduleResponseDto(schedule);
+    }
+
+    @Transactional
+    @Override
+    public ScheduleResponseDto updateScheduleTitleById(Long id, String title, String password) {
+        if(title == null || password == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The title and password are required values");
+        }
+        else if(!password.equals(scheduleRepository.findPassword(id).getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is incorrect");
+        }
+
+        int updatedRow = scheduleRepository.updateScheduleTitleById(id, title, password);
+
+        if(updatedRow == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id : " + id);
+        }
+
+        Schedule schedule = scheduleRepository.findScheduleByIdOrElseThrow(id);
+
+        return new ScheduleResponseDto(schedule);
+    }
+
+    @Transactional
+    @Override
+    public void deleteScheduleById(Long id) {
+        int deletedRow = scheduleRepository.deleteScheduleById(id);
+
+        if(deletedRow == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id : " + id);
+        }
     }
 }

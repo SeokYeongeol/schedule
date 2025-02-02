@@ -52,14 +52,24 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     @Override
+    public Schedule findPassword(Long id) {
+        List<Schedule> result = jdbcTemplate.query("select * from schedule where id = ?", scheduleRowMapperV3(), id);
+        return result.stream().findAny().get();
+    }
+
+    @Override
     public int updateScheduleById(Long id, String name, String contents, String password) {
         return jdbcTemplate.update("update schedule set name = ?, contents = ?, password = ? where id = ?", name, contents, password, id);
     }
 
     @Override
-    public Schedule findPassword(Long id) {
-        List<Schedule> result = jdbcTemplate.query("select * from schedule where id = ?", scheduleRowMapperV3(), id);
-        return result.stream().findAny().get();
+    public int updateScheduleTitleById(Long id, String title, String password) {
+        return jdbcTemplate.update("update schedule set title = ?, password = ? where id = ?", title, password, id);
+    }
+
+    @Override
+    public int deleteScheduleById(Long id) {
+        return jdbcTemplate.update("delete from schedule where id = ?", id);
     }
 
     private RowMapper<Schedule> scheduleRowMapper() {
