@@ -16,6 +16,11 @@ public class Schedule {
     private String contents;
     private Date date;
 
+    public Schedule(Long id, String password) {
+        this.id = id;
+        this.password = password;
+    }
+
     public Schedule(String name, String password, String title, String contents, Date date) {
         this.name = name;
         this.password = password;

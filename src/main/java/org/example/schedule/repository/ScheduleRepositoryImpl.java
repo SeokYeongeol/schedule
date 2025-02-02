@@ -12,10 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class ScheduleRepositoryImpl implements ScheduleRepository {
@@ -54,6 +51,17 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
         return result;
     }
 
+    @Override
+    public int updateScheduleById(Long id, String name, String contents, String password) {
+        return jdbcTemplate.update("update schedule set name = ?, contents = ?, password = ? where id = ?", name, contents, password, id);
+    }
+
+    @Override
+    public Schedule findPassword(Long id) {
+        List<Schedule> result = jdbcTemplate.query("select * from schedule where id = ?", scheduleRowMapperV3(), id);
+        return result.stream().findAny().get();
+    }
+
     private RowMapper<Schedule> scheduleRowMapper() {
         return new RowMapper<Schedule>() {
             @Override
@@ -79,6 +87,18 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                         rs.getString("title"),
                         rs.getString("contents"),
                         rs.getDate("date")
+                );
+            }
+        };
+    }
+
+    private RowMapper<Schedule> scheduleRowMapperV3() {
+        return new RowMapper<Schedule>() {
+            @Override
+            public Schedule mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return new Schedule(
+                        rs.getLong("id"),
+                        rs.getString("password")
                 );
             }
         };

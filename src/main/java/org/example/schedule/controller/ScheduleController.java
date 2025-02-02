@@ -32,4 +32,12 @@ public class ScheduleController {
     public ResponseEntity<List<ScheduleResponseDto>> findAllSchedule () {
         return new ResponseEntity<>(scheduleService.findAllSchedules(), HttpStatus.OK);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ScheduleResponseDto> updateScheduleById(
+            @PathVariable Long id,
+            @RequestBody ScheduleRequestDto dto
+    ) {
+        return new ResponseEntity<>(scheduleService.updateScheduleById(id, dto.getName(), dto.getContents(), dto.getPassword()), HttpStatus.OK);
+    }
 }

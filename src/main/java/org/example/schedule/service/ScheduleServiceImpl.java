@@ -4,7 +4,10 @@ import org.example.schedule.dto.ScheduleRequestDto;
 import org.example.schedule.dto.ScheduleResponseDto;
 import org.example.schedule.entity.Schedule;
 import org.example.schedule.repository.ScheduleRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
@@ -31,5 +34,24 @@ public class ScheduleServiceImpl implements ScheduleService{
     @Override
     public List<ScheduleResponseDto> findAllSchedules() { return scheduleRepository.findAllSchedules(); }
 
+    @Transactional
+    @Override
+    public ScheduleResponseDto updateScheduleById(Long id, String name, String contents, String password) {
+        if(name == null || contents == null || password == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name, contents and password are required values.");
+        }
+        else if(!password.equals(scheduleRepository.findPassword(id).getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is incorrect");
+        }
 
+        int updatedRow = scheduleRepository.updateScheduleById(id, name, contents, password);
+
+        if(updatedRow == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id : " + id);
+        }
+
+        Schedule schedule = scheduleRepository.findScheduleByIdOrElseThrow(id);
+
+        return new ScheduleResponseDto(schedule);
+    }
 }
