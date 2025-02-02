@@ -2,13 +2,19 @@ package org.example.schedule.repository;
 
 import org.example.schedule.dto.ScheduleResponseDto;
 import org.example.schedule.entity.Schedule;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -23,7 +29,6 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     public ScheduleResponseDto saveSchedule(Schedule schedule) {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         jdbcInsert.withTableName("schedule").usingGeneratedKeyColumns("id");
-        schedule.setDate(new Date());
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("name", schedule.getName());
@@ -35,5 +40,47 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters));
 
         return new ScheduleResponseDto(key.longValue(), schedule.getName(), schedule.getPassword(), schedule.getTitle(), schedule.getContents(), schedule.getDate());
+    }
+
+    @Override
+    public Schedule findScheduleByIdOrElseThrow(Long id) {
+        List<Schedule> result = jdbcTemplate.query("select * from schedule where id = ?", scheduleRowMapper(), id);
+        return result.stream().findAny().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id : " + id));
+    }
+
+    @Override
+    public List<ScheduleResponseDto> findAllSchedules() {
+        List<ScheduleResponseDto> result = jdbcTemplate.query("select * from schedule", scheduleRowMapperV2());
+        return result;
+    }
+
+    private RowMapper<Schedule> scheduleRowMapper() {
+        return new RowMapper<Schedule>() {
+            @Override
+            public Schedule mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return new Schedule(
+                        rs.getLong("id"),
+                        rs.getString("name"),
+                        rs.getString("title"),
+                        rs.getString("contents"),
+                        rs.getDate("date")
+                );
+            }
+        };
+    }
+
+    private RowMapper<ScheduleResponseDto> scheduleRowMapperV2() {
+        return new RowMapper<ScheduleResponseDto>() {
+            @Override
+            public ScheduleResponseDto mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return new ScheduleResponseDto(
+                        rs.getLong("id"),
+                        rs.getString("name"),
+                        rs.getString("title"),
+                        rs.getString("contents"),
+                        rs.getDate("date")
+                );
+            }
+        };
     }
 }
