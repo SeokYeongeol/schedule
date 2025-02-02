@@ -54,17 +54,17 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     @Override
     public Schedule findPassword(Long id) {
         List<Schedule> result = jdbcTemplate.query("select * from schedule where id = ?", scheduleRowMapperV3(), id);
-        return result.stream().findAny().get();
+        return result.stream().findAny().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id : " + id));
     }
 
     @Override
     public int updateScheduleById(Long id, String name, String contents, String password) {
-        return jdbcTemplate.update("update schedule set name = ?, contents = ?, password = ? where id = ?", name, contents, password, id);
+        return jdbcTemplate.update("update schedule set name = ?, contents = ?, password = ?, date = now() where id = ?", name, contents, password, id);
     }
 
     @Override
     public int updateScheduleTitleById(Long id, String title, String password) {
-        return jdbcTemplate.update("update schedule set title = ?, password = ? where id = ?", title, password, id);
+        return jdbcTemplate.update("update schedule set title = ?, password = ?, date = now() where id = ?", title, password, id);
     }
 
     @Override

@@ -59,7 +59,7 @@ public class ScheduleServiceImpl implements ScheduleService{
     @Override
     public ScheduleResponseDto updateScheduleTitleById(Long id, String title, String password) {
         if(title == null || password == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The title and password are required values");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The title and password are required values.");
         }
         else if(!password.equals(scheduleRepository.findPassword(id).getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is incorrect");
