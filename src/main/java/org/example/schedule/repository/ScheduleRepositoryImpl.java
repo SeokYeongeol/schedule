@@ -68,8 +68,8 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     @Override
-    public int deleteScheduleById(Long id) {
-        return jdbcTemplate.update("delete from schedule where id = ?", id);
+    public int deleteScheduleById(Long id, String password) {
+        return jdbcTemplate.update("delete from schedule where id = ? and password = ?", id, password);
     }
 
     private RowMapper<Schedule> scheduleRowMapper() {
