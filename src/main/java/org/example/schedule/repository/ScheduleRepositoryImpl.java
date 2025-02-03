@@ -32,11 +32,12 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
         parameters.put("password", schedule.getPassword());
         parameters.put("title", schedule.getTitle());
         parameters.put("contents", schedule.getContents());
-        parameters.put("date", schedule.getDate());
+        parameters.put("createdAt", schedule.getCreatedAt());
+        parameters.put("modifiedAt", schedule.getModifiedAt());
 
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters));
 
-        return new ScheduleResponseDto(key.longValue(), schedule.getName(), schedule.getPassword(), schedule.getTitle(), schedule.getContents(), schedule.getDate());
+        return new ScheduleResponseDto(key.longValue(), schedule.getName(), schedule.getPassword(), schedule.getTitle(), schedule.getContents(), schedule.getCreatedAt(), schedule.getModifiedAt());
     }
 
     @Override
@@ -59,12 +60,12 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
     @Override
     public int updateScheduleById(Long id, String name, String contents, String password) {
-        return jdbcTemplate.update("update schedule set name = ?, contents = ?, password = ?, date = now() where id = ?", name, contents, password, id);
+        return jdbcTemplate.update("update schedule set name = ?, contents = ?, password = ?, modifiedAt = now() where id = ?", name, contents, password, id);
     }
 
     @Override
     public int updateScheduleTitleById(Long id, String title, String password) {
-        return jdbcTemplate.update("update schedule set title = ?, password = ?, date = now() where id = ?", title, password, id);
+        return jdbcTemplate.update("update schedule set title = ?, password = ?, modifiedAt = now() where id = ?", title, password, id);
     }
 
     @Override
@@ -81,7 +82,8 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                         rs.getString("name"),
                         rs.getString("title"),
                         rs.getString("contents"),
-                        rs.getDate("date")
+                        rs.getTimestamp("createdAt").toLocalDateTime(),
+                        rs.getTimestamp("modifiedAt").toLocalDateTime()
                 );
             }
         };
@@ -96,7 +98,8 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                         rs.getString("name"),
                         rs.getString("title"),
                         rs.getString("contents"),
-                        rs.getDate("date")
+                        rs.getTimestamp("createdAt").toLocalDateTime(),
+                        rs.getTimestamp("modifiedAt").toLocalDateTime()
                 );
             }
         };
