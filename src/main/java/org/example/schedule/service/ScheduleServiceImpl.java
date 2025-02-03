@@ -1,5 +1,6 @@
 package org.example.schedule.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.schedule.dto.ScheduleRequestDto;
 import org.example.schedule.dto.ScheduleResponseDto;
 import org.example.schedule.entity.Schedule;
@@ -12,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class ScheduleServiceImpl implements ScheduleService{
     private final ScheduleRepository scheduleRepository;
@@ -23,6 +25,10 @@ public class ScheduleServiceImpl implements ScheduleService{
     @Override
     public ScheduleResponseDto saveSchedule(ScheduleRequestDto dto) {
         Schedule schedule = new Schedule(dto.getName(), dto.getPassword(), dto.getTitle(), dto.getContents(), LocalDateTime.now(), LocalDateTime.now());
+
+        if(schedule.getName() == null || schedule.getPassword() == null || schedule.getTitle() == null || schedule.getContents() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The name, password, title and contents are required values.");
+        }
         return scheduleRepository.saveSchedule(schedule);
     }
 
