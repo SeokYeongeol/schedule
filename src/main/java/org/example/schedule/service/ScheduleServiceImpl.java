@@ -42,8 +42,7 @@ public class ScheduleServiceImpl implements ScheduleService{
     public ScheduleResponseDto updateScheduleById(Long id, String name, String contents, String password) {
         if(name == null || contents == null || password == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The name, contents and password are required values.");
-        }
-        else if(!password.equals(scheduleRepository.findPassword(id).getPassword())) {
+        } else if(!password.equals(scheduleRepository.findPassword(id).getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is incorrect");
         }
 
@@ -63,8 +62,7 @@ public class ScheduleServiceImpl implements ScheduleService{
     public ScheduleResponseDto updateScheduleTitleById(Long id, String title, String password) {
         if(title == null || password == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The title and password are required values.");
-        }
-        else if(!password.equals(scheduleRepository.findPassword(id).getPassword())) {
+        } else if(!password.equals(scheduleRepository.findPassword(id).getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is incorrect");
         }
 
@@ -82,7 +80,7 @@ public class ScheduleServiceImpl implements ScheduleService{
     @Transactional
     @Override
     public void deleteScheduleById(Long id, String password) {
-        if(password == null) { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The password is required value."); }
+        if(password == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The password is required value.");
 
         else if(!password.equals(scheduleRepository.findPassword(id).getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is incorrect");
@@ -90,8 +88,6 @@ public class ScheduleServiceImpl implements ScheduleService{
 
         int deletedRow = scheduleRepository.deleteScheduleById(id, password);
 
-        if(deletedRow == 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id : " + id);
-        }
+        if(deletedRow == 0) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id : " + id);
     }
 }
