@@ -22,6 +22,7 @@ public class ScheduleServiceImpl implements ScheduleService{
         this.scheduleRepository = scheduleRepository;
     }
 
+    @Transactional
     @Override
     public ScheduleResponseDto saveSchedule(ScheduleRequestDto dto) {
         Schedule schedule = new Schedule(dto.getName(), dto.getPassword(), dto.getTitle(), dto.getContents(), LocalDateTime.now(), LocalDateTime.now());
